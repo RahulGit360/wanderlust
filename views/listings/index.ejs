@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Listings</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h3>All Listings</h3>
+    <ul>
+        <form method="GET" action="/listings/new"> 
+            <button>add new listing</button>
+        </form>
+    <% for (let listing of allListings){ %>
+       <li> <a href="/listings/<%= listing._id %>"><%= listing.title %></a> </li>
+
+
+    <%} %>
+    </ul>
+</body>
+</html>
+<!-- <% allListings.forEach(listing => { %>
+    <div class="listing-card">
+      <h2><%= listing.title %></h2>
+      <p><%= listing.description %></p>
+      <p><strong>Price:</strong> $<%= listing.price %></p>
+      <p><strong>Location:</strong> <%= listing.location %>, <%= listing.country %></p>
+      <img src="<%= listing.image %>" alt="<%= listing.title %>">
+    </div>
+  <% }) %> -->

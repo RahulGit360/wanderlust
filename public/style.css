@@ -1,0 +1,19 @@
+.listings-container {
+    display: flex;
+    flex-wrap: wrap;     /* allows items to wrap into multiple rows if needed */
+    gap: 20px;           /* space between cards */
+  }
+  
+  .listing-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    width: 300px;        /* all cards same width */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .listing-card img {
+    width: 100%;
+    border-radius: 6px;
+  }
+  
