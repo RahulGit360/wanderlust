@@ -1,23 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listing</title>
-</head>
+<%- layout('layouts/boilerplate') %>
 <body>
-    <div>
+    <div class="row mt-3">
+        <div class="col-8 offset-2">
         <h1><%= listing.title %></h1>
         <p><strong>Description:</strong> <%= listing.description %></p>
+        
         <p><strong>price &#36;</strong><%= listing.price.toLocaleString("en-US") %></p>
+        
         <p><strong>Location:</strong> <%= listing.location %>, <%= listing.country %></p>
+        
         <img src="<%= listing.image %>" alt="<%= listing.title %>" style="max-width: 300px; max-height: 300px;">
+        
         <p> Location : <%= listing.location %></p>
-        <a href="/listings/<%= listing._id %>/edit">Edit</a>
+        
+        <a href="/listings/<%= listing._id %>/edit"> <button class="btn btn-dark edit-btn"> Edit</button></a>
+        <br/>
+        <br/>
         <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
-            <button>delete</button>
+            <button class="btn btn-dark ">delete</button>
         </form>
 
     </div>
+</div>
 </body>
-</html>

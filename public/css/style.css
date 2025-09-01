@@ -1,0 +1,105 @@
+/* body */
+body{
+  font-family: "Funnel Sans", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* boilerplate container */
+.container{
+  flex:1;
+} 
+
+/* navbar */
+.navbar{
+  height: 5rem;
+}
+.fa-compass {
+  color: #fe424d;;
+  font-size: 2rem;
+
+}
+.nav-link{
+  color: #222222 !important;
+}
+
+
+/* footer */
+.f-info-links a {
+  text-decoration: none;
+  color: #222222;
+
+}
+.f-info-links a:hover {
+  text-decoration: underline;
+}
+
+.f-info {
+  background-color: #ebebeb;
+  display: flex;
+  flex-wrap: wrap;              /* allows items to wrap */
+  justify-content: space-evenly;/* spaces items across the row */
+  align-items: center;          /* centers items vertically in the row */
+  gap: 0.75rem;                 /* optional: space between items */
+  padding: 1rem;                /* optional: breathing room */
+  text-align: center;           /* nice for short texts/icons */
+}
+
+.f-info-links, .f-info-social {
+  width: 100%;
+  vertical-align: middle;
+  display: flex;
+  align-items: center; 
+  justify-content: center;/* centers items vertically */
+}
+
+.f-info-social i{
+  margin-right: 1rem;
+  font-size: 1.5rem;
+}
+
+/* cards */
+
+.card{
+  border: none;
+}
+.card-img-top{
+  border-radius: 1rem;
+  width: 100%;
+  object-fit:cover;
+
+}
+
+.card-body{
+  padding: 0;
+
+}
+.card-text p{
+  font-weight: 400;
+}
+
+.listing-link{
+  text-decoration: none;
+  color: #222222;
+}
+
+/* image overlay */
+.card-img-overlay{
+  opacity: 0;
+
+}
+.card-img-overlay:hover{
+  opacity: .2;
+  background-color: white;
+  transition: opacity 0.3s ease;
+}
+
+.add-btn{
+  background-color: #fe424d;
+  border: none;
+}
+.edit-btn{
+  background-color: #fe424d;
+  border: none;
+}
