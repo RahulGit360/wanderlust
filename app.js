@@ -1,118 +1,74 @@
-const express = require('express');   // requiresing expresess
-const app = express();         // assigning express variable to app
-const mongoose = require('mongoose');  // Requiring mongoose
-const PORT = 8080; // assigning port number to a variable
-const Listing = require('./models/listing'); 
-const path = require('path'); // Requiring path module
-const ejsMate = require('ejs-mate'); // Requiring ejs-mate for layout support in EJS templates// Setting up EJS as the view engine with ejs-mate for layout support
-const wrapAsync = require('./utils/wrapAsync');
-const ExpressError = require('./utils/ExpressError');
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+const path = require('path');
+const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
-const {listingSchema} = require('./schema');
 
-app.use(methodOverride('_method')); // Requiring method-override to support PUT and DELETE methods in forms// Middleware to override HTTP methods using query parameters
-// Setting up the Express application
+const ExpressError = require('./utils/ExpressError');
 
-app.set('view engine', 'ejs'); // Setting the view engine to EJS
-app.set('views',path.join(__dirname,'views')); // Setting the views directory to 'views' folder in the current directory
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' directory
-app.use(express.urlencoded({ extended: true})); // Middleware to parse URL-encoded bodies (form submissions)
-app.use(express.json()); // Add this before defining routes
+const listingsRoutes = require('./routes/listings'); // <-- this must exist
+const reviewRoutes = require('./routes/review'); // <-- this must exist
 
-app.engine('ejs', ejsMate); // Using ejs-mate as the template engine for EJS
-// ejs-mate allows us to use layouts in EJS templates
+const session = require('express-session');
+const flash = require('express-flash');
 
-app.get("/", (req,res)=>{
-    res.send("Hi, I am root");
-});
-
-app.listen(PORT, ()=>{
-    console.log("app is listening on server 8080"); // .listen is a method that makes express to listen for incoming http requests on the paticular port3
-});
-
+const PORT = 8080;
 const MONGO_URL = 'mongodb://127.0.0.1:27017/wanderlust';
-async function main(){
-    await mongoose.connect(MONGO_URL);
-}
 
-main().then(()=>{
-    console.log("connected to DB");
-}).catch((err)=>{
-    console.log("Error caught");
-});
+// view engine & middleware
+app.engine('ejs', ejsMate);
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// Route to get all listings and render them using EJS template
-app.get('/listings',wrapAsync( async (req, res) => {
-    try {
-      const allListings = await Listing.find({});
-      res.render('listings/index', { allListings });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Error fetching listings");
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(methodOverride('_method'));
+
+const sessionConfig = {
+    secret: "mysecret",
+    resave: false,
+    saveUninitialized: true,
+    cookie:{
+        httpOnly: true,
+        expires: Date.now()+1000*60*60*24*7,
+        maxAge: 1000*60*60*24*7
     }
-  }));
+};
+app.use(session(sessionConfig));
+app.use(flash());
 
-  //new route
-app.get('/listings/new', (req,res)=>{
-    res.render('listings/new');
+app.get('/', (req, res) => {
+  res.send('Hi, I am root');
 });
 
-//show route
-app.get("/listings/:id", wrapAsync(async (req, res) => {
-    let {id} = req.params;
-    const listing = await Listing.findById(id);
-    res.render('listings/show', {listing});
-}));
+app.use((req,res,next)=>{
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+});
+// mount router
+app.use('/listings', listingsRoutes);
+app.use('listings/:id/reviews', reviewRoutes);
 
-let requestValidate = (req,res, next)=>{
-    let {error} = listingSchema.validate(req.body);
-        if(error){
-            let msg = error.details.map(el => el.message).join(',');
-            throw new ExpressError(msg, 400);
-        }else{
-            next();
-        }
-}
-
-// create route
-app.post('/listings', requestValidate, 
-    wrapAsync(async (req,res, next)=>{
-        const newListing = req.body.listing; // Extracting listing data from the request body
-        await Listing.create(newListing);
-        res.redirect('/listings');
-
-}));
-
-//edit route
-app.get('/listings/:id/edit',wrapAsync( async (req,res)=>{
-    let {id} = req.params;
-    const listing = await Listing.findById(id);
-    res.render("listings/edit", {listing});
-}));
-
-//update route
-app.put('/listings/:id', requestValidate, wrapAsync (async(req,res)=>{
-    let {id} = req.params; // Extracting the ID from the request parameters
-    let updatedListing = req.body.listing; // Extracting updated listing data from the request body
-    await Listing.findByIdAndUpdate(id, updatedListing, {new: true}) // Updating the listing in the database
-    res.redirect(`/listings/${id}`); // Redirecting to the updated listing's show page
-    
-}));
-
-//delete route
-app.delete('/listings/:id', wrapAsync(async (req,res)=>{
-    let {id} = req.params; // Extracting the ID from the request parameters
-    await Listing.findByIdAndDelete(id); // Deleting the listing from the database
-    res.redirect('/listings'); // Redirecting to the listings index page
-}
-));
-
-app.use(/.*/, (req,res,next)=>{
-    next(new ExpressError("Page Not Found", 404,));
+// 404
+app.use(/.*/, (req, res, next) => {
+  next(new ExpressError('Page Not Found', 404));
 });
 
-app.use((err,req,res,next)=>{
-    let {message="something went wrong", statusCode=500} = err;
-    res.status(statusCode).render('listings/error', { message} );
+// error handler
+app.use((err, req, res, next) => {
+  const { message = 'Something went wrong', statusCode = 500 } = err;
+  res.status(statusCode).render('listings/error', { message });
+});
 
+// db + start
+async function main() { await mongoose.connect(MONGO_URL); }
+main()
+  .then(() => console.log('connected to DB'))
+  .catch((err) => console.error('DB connection error:', err));
+
+app.listen(PORT, () => {
+  console.log('app is listening on server 8080');
 });

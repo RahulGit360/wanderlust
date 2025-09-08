@@ -1,5 +1,5 @@
 <%- layout('layouts/boilerplate') %>
-<body>
+
     <div class="row mt-3">
         <div class="col-8 offset-2">
         <h1><%= listing.title %></h1>
@@ -21,5 +21,52 @@
         </form>
 
     </div>
+    
+    <div class="col-8 offset-2 mb-3">
+        <hr/>
+        <form method="POST" action="/listings/<%= listing._id %>/reviews" class="needs-validation" novalidate>
+            <h3> Leave a Review</h3>
+            <div class="mb-3 mt-3">
+                <label for="rating" >Rating</label>
+                <input type="range" min="1" max="5" id="rating" class="form-range" name="review[rating]"  required>
+            </div>
+            <div class="mb-3 mt-3">
+                <label for="comment" class="form-label">Description</label>
+                <textarea name="review[comment]" class="form-control" id="comment" cols="50" rows="5" required></textarea>
+                <div class="valid-feedback">
+                    Looks good!
+                 </div>
+                <div class="invalid-feedback">
+                    Please enter the comment.
+                 </div>
+            </div>
+            <div class="mb-3 mt-3">
+                <button class="btn btn-dark mt-3">Submit Review</button>
+            </div>
+        </form>
+        <hr/>
+        <h3> All Reviews</h3>
+<div class="row">
+  <% for (let review of listing.reviews) { %>
+    <div class="col-12 col-md-8 col-lg-6 mb-3">
+      <div class="card">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <h5 class="card-title">Rating: <%= review.rating %> / 5</h5>
+          <p class="card-text"><strong>Comment:</strong> <%= review.comment %></p>
+        </div>
+        <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+          <button class="btn btn-sm btn-dark mt-2 w-auto">Delete Review</button>
+        </form>
+        
+      </div>
+    </div>
+  <% } %>
 </div>
-</body>
+
+        
+        
+    </div>
+</div>
+
+
+
