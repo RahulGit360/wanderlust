@@ -9,9 +9,14 @@ const ExpressError = require('./utils/ExpressError');
 
 const listingsRoutes = require('./routes/listings'); // <-- this must exist
 const reviewRoutes = require('./routes/review'); // <-- this must exist
+const userRoutes = require('./routes/user'); // <-- this must exist
 
 const session = require('express-session');
 const flash = require('express-flash');
+
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user');
 
 const PORT = 8080;
 const MONGO_URL = 'mongodb://127.0.0.1:27017/wanderlust';
@@ -39,6 +44,12 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());   
+
 app.get('/', (req, res) => {
   res.send('Hi, I am root');
 });
@@ -46,11 +57,25 @@ app.get('/', (req, res) => {
 app.use((req,res,next)=>{
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
+    let currentUser = req.user;
+    res.locals.currentUser = currentUser;
     next();
 });
+
+// app.get('/fakeUser', async(req,res)=>{
+//     let fakeuser = new User({
+//         email: "student@gmail.com",
+//         username : "student",
+//     });
+//     let registeredUser = await User.register(fakeuser, 'chicken');
+//     console.log(registeredUser);
+//     res.send(registeredUser);
+
+// });
 // mount router
 app.use('/listings', listingsRoutes);
-app.use('listings/:id/reviews', reviewRoutes);
+app.use('/listings/:id/reviews', reviewRoutes);
+app.use('/', userRoutes);
 
 // 404
 app.use(/.*/, (req, res, next) => {

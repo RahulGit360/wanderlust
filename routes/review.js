@@ -3,22 +3,15 @@ const router = express.Router({ mergeParams: true });
 
 const wrapAsync = require('../utils/wrapAsync');
 const ExpressError = require('../utils/ExpressError');
+const Review = require('../models/review');
 
 const Listing = require('../models/listing');
-const Review  = require('../models/review');
-const { reviewSchema } = require('../schema'); // Joi schema
+const { validateReview } = require('../middleware');
 
 
 
 // validator
-const validateReview = (req, res, next) => {
-  const { error } = reviewSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map(el => el.message).join(', ');
-    throw new ExpressError(msg, 400);
-  }
-  next();
-};
+
 
 // CREATE review: POST /listings/:id/reviews
 router.post('/', validateReview, wrapAsync(async (req, res) => {

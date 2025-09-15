@@ -15,6 +15,7 @@ main().then(()=>{
 
 const seedDB = async () => {
     await Listing.deleteMany({});
+    initData.data  = initData.data.map((obj)=>({ ...obj, owner:"68c1da1ed49d1a1a07f8e5be"}));
     await Listing.insertMany(initData.data);
     console.log("DB Seeded");
 };
