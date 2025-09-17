@@ -1,6 +1,8 @@
 const ExpressError = require('./utils/ExpressError');
 const { listingSchema } = require('./schema'); 
 const Listing = require('./models/listing');
+const { reviewSchema } = require('./schema');
+let Review = require('./models/review');
 
 
 module.exports.validateListing = (req, res, next) => {
@@ -48,4 +50,25 @@ module.exports.validateReview = (req, res, next) => {
           throw new ExpressError(msg, 400);
         }
         next();
+      };
+
+module.exports.isReviewAuthor = async (req, res, next) => {
+        try {
+          const { id, reviewId } = req.params;
+      
+          // DO NOT shadow the model name; use a different var
+          const reviewDoc = await Review.findById(reviewId);
+          if (!reviewDoc) {
+            req.flash('error', 'Review not found');
+            return res.redirect(`/listings/${id}`);
+          }
+      
+          if (!reviewDoc.author.equals(req.user._id)) {
+            req.flash('error', 'You do not have permission to do that!');
+            return res.redirect(`/listings/${id}`);
+          }
+          next();
+        } catch (err) {
+          next(err);
+        }
       };
