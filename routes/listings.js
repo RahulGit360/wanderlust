@@ -9,27 +9,25 @@ const listingController = require('../controllers/listings');
 const { index, renderNewForm, createListing , showListing, renderEditForm, updateListing, deleteListing} = listingController;
 const ExpressError = require('../utils/ExpressError');
 
+router
+    .route('/').get(wrapAsync(index))
+    .post(validateListing, isLoggedIn, wrapAsync(createListing));  
+// index // create
 
-
-// index
-router.get('/', wrapAsync(index));
 
 // new
 router.get('/new',isLoggedIn ,renderNewForm);
 
-// create
-router.post('/', validateListing, isLoggedIn, wrapAsync(createListing));
+router
+    .route('/:id')
+    .get(wrapAsync(showListing))
+    .put(isLoggedIn, isOwner, validateListing, wrapAsync(updateListing))
+    .delete(isLoggedIn,isOwner,  wrapAsync(deleteListing));
+// show // update // delete
 
-// show
-router.get('/:id', wrapAsync(showListing));
 
 // edit
 router.get('/:id/edit', isLoggedIn, isOwner,  wrapAsync(renderEditForm));
 
-// update
-router.put('/:id',isLoggedIn, isOwner, validateListing, wrapAsync(updateListing));
-
-// delete
-router.delete('/:id',isLoggedIn,isOwner,  wrapAsync(deleteListing));
 
 module.exports = router;

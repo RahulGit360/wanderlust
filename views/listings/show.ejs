@@ -13,7 +13,7 @@
 
     <p> Location : <%= listing.location %></p>
 
-    <% if (currentUser && currentUser._id === listing.owner._id) { %>
+    <% if (currentUser && currentUser._id.equals(listing.owner._id)) { %>
       <div class="btns">
         <a href="/listings/<%= listing._id %>/edit">
           <button class="btn btn-dark edit-btn">Edit</button>

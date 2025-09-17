@@ -23,7 +23,6 @@ module.exports.showListing = async (req, res) => {
       return res.redirect('/listings');
     }else{
     res.render('listings/show', { listing });
-    console.log(listing);
   }
   };
 module.exports.renderEditForm = async (req, res) => {
