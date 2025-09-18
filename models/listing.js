@@ -11,14 +11,8 @@ const listingSchema = new Schema({
     },
     description: String,
     image: {
-    type: String,
-    default: DEFAULT_IMG,
-    set: (v) => {
-        if (v == null) return DEFAULT_IMG;               // null/undefined
-        if (typeof v === 'object') return v.url || DEFAULT_IMG; // { filename, url }
-        if (typeof v === 'string') return v.trim() === '' ? DEFAULT_IMG : v;
-        return DEFAULT_IMG;
-    },
+        url: String,
+        filename: String,
     },
     price: Number,
     location: String,
@@ -34,6 +28,17 @@ const listingSchema = new Schema({
         ref: 'User'
     },
     country: String,
+    geometry: {
+        type: {
+          type: String, // Don't do `{ location: { type: String } }`
+          enum: ['Point'], // 'location.type' must be 'Point'
+          required: true
+        },
+        coordinates: {
+          type: [Number],
+          required: true
+        }
+      }
 });
 
 listingSchema.post('findOneAndDelete', async(listing)=>{

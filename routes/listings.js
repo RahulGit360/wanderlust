@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapToken = process.env.MAP_TOKEN;
+const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 const wrapAsync = require('../utils/wrapAsync');
 
@@ -9,10 +12,15 @@ const listingController = require('../controllers/listings');
 const { index, renderNewForm, createListing , showListing, renderEditForm, updateListing, deleteListing} = listingController;
 const ExpressError = require('../utils/ExpressError');
 
+const multer  = require('multer')
+const { storage } = require('../cloudConfig');
+const upload = multer({ storage });
+
+
 router
     .route('/').get(wrapAsync(index))
-    .post(validateListing, isLoggedIn, wrapAsync(createListing));  
-// index // create
+    .post(validateListing, isLoggedIn,upload.single("listing[image]"), wrapAsync(createListing));  
+// index // create // 
 
 
 // new
@@ -21,7 +29,7 @@ router.get('/new',isLoggedIn ,renderNewForm);
 router
     .route('/:id')
     .get(wrapAsync(showListing))
-    .put(isLoggedIn, isOwner, validateListing, wrapAsync(updateListing))
+    .put(isLoggedIn, isOwner,upload.single("listing[image]"), validateListing, wrapAsync(updateListing))
     .delete(isLoggedIn,isOwner,  wrapAsync(deleteListing));
 // show // update // delete
 

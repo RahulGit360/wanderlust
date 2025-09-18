@@ -103,3 +103,6 @@ body{
   background-color: #fe424d;
   border: none;
 }
+#map {  width: 400px;
+  height: 400px; 
+}
