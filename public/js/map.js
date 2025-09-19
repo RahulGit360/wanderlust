@@ -8,7 +8,7 @@ const map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/streets-v12', // Use the standard style for the map
     projection: 'globe', // display the map as a globe
     zoom: 9, // initial zoom level, 0 is the world view, higher values zoom in
-    center: coordinates // center the map on this longitude and latitude
+    center: listing.geometry.coordinates // center the map on this longitude and latitude
  });
       
 map.addControl(new mapboxgl.NavigationControl());
@@ -16,10 +16,10 @@ map.scrollZoom.disable();
 map.on('style.load', () => {
 map.setFog({}); // Set the default atmosphere style
 });
-
-console.log(coordinates);
+const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`<p>${listing.location}</p>`);
 
 const marker = new mapboxgl.Marker({ color: 'black', rotation: 45 })
-.setLngLat(coordinates)
+.setLngLat(listing.geometry.coordinates )
+.setPopup(popup)
 .addTo(map);
 

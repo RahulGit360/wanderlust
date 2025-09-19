@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-const mapToken = process.env.MAP_TOKEN;
-const geocodingClient = mbxGeocoding({ accessToken: mapToken });
+
 
 const wrapAsync = require('../utils/wrapAsync');
 
@@ -17,9 +15,12 @@ const { storage } = require('../cloudConfig');
 const upload = multer({ storage });
 
 
+
 router
     .route('/').get(wrapAsync(index))
-    .post(validateListing, isLoggedIn,upload.single("listing[image]"), wrapAsync(createListing));  
+    .post(validateListing, isLoggedIn,
+    upload.single("listing[image]"),
+     wrapAsync(createListing));  
 // index // create // 
 
 
